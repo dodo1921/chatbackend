@@ -29,7 +29,7 @@ pubsub.subscribe( 'projects/testjewelchat/topics/topic1', {
   interval: 30
 }).then( data => {
 
-  const subscription = data[1];
+  const subscription = data[0];
 
   function onError(err) {
 
