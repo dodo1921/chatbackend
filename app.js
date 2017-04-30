@@ -61,7 +61,13 @@ io.on('connection', function(socket){
   console.log('a user connected');
   socket.join('omg');
   socket.emit('join', { pid: process.pid});
-	socketioroutes.setup(socket, 'topic');
+	//socketioroutes.setup(socket, 'topic');
+  socket.on('disconnect', () => {
+
+      console.log('Disconnected');
+      
+
+  });
 
 });
 
