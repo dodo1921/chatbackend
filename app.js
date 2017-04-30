@@ -16,18 +16,12 @@ const io = require('socket.io')(server);
 const socketioutils = require('./utils/socketioutils');
 const socketioroutes = require('./socketioroutes');
 
-/*
+
 const pubsub = require('@google-cloud/pubsub')();
 
-const knex = require('./util/knex');
+//const knex = require('./util/knex');
 
-const topic = pubsub.createTopic('')
-									.then( data => {
 
-									})	
-									.catch( err => {
-
-									});
 
 pubsub.subscribe(topic, {
   ackDeadlineSeconds: 90,
@@ -35,35 +29,31 @@ pubsub.subscribe(topic, {
   interval: 30
 }).then( data => {
 
-	})
-	.catch( err => {
+  const subscription = data[1];
 
-	});
-
- function(err, subscription, apiResponse) {
-  // Register listeners to start pulling for messages.
   function onError(err) {}
   function onMessage(message) {
 
-  			const room = io.sockets.adapter.rooms['my_room'];
-				return room.length > 0;
+      io.to('omg').emit('join', message );   
 
   }
   subscription.on('error', onError);
   subscription.on('message', onMessage);
 
-  // Remove listeners to stop pulling for messages. 
 
-  
-});
+	})
+	.catch( err => {
 
-*/
+	});
+
+
 
 io.use(socketioutils.authenticate);
 
 io.on('connection', function(socket){
 
   console.log('a user connected');
+  socket.join('omg');
   socket.emit('join', { pid: process.pid});
 	socketioroutes.setup(socket, 'topic');
 

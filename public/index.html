@@ -13,7 +13,7 @@
 		  var socket = io();
 
 		  socket.on('join', function (data) {
-		  	$('#pid').text(data.pid);
+		  	$('#pid').text(data);
 			  console.log(data);
 			});
 
