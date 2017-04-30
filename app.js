@@ -23,7 +23,7 @@ const pubsub = require('@google-cloud/pubsub')();
 
 
 
-pubsub.subscribe( 'topic1', {
+pubsub.subscribe( 'projects/testjewelchat/topics/topic1', {
   ackDeadlineSeconds: 90,
   autoAck: true,
   interval: 30
@@ -31,7 +31,11 @@ pubsub.subscribe( 'topic1', {
 
   const subscription = data[1];
 
-  function onError(err) {}
+  function onError(err) {
+
+    console.log('Error subscription');
+
+  }
   function onMessage(message) {
 
       io.to('omg').emit('join', message );   
@@ -43,7 +47,7 @@ pubsub.subscribe( 'topic1', {
 
 	})
 	.catch( err => {
-
+    console.log('Error pubsub');
 	});
 
 
