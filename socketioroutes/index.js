@@ -12,7 +12,12 @@ var sockerioroutes = module.exports = {
 
 
 
-  	//socket.on('disconnect', controllers.disconnect(packet, callback));
+  	socket.on('disconnect', (socket) => {
+
+  		console.log('Disconnected');
+  		socket.leave('omg');
+
+  	});
 
   }
   
