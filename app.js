@@ -47,7 +47,7 @@ pubsub.subscribe( 'projects/testjewelchat/topics/topic1', {
 
 	})
 	.catch( err => {
-    console.log('Error pubsub');
+    console.log('Error pubsub'+ err );
 	});
 
 
