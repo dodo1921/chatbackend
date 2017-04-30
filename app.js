@@ -23,7 +23,7 @@ const pubsub = require('@google-cloud/pubsub')();
 
 
 
-pubsub.subscribe(topic, {
+pubsub.subscribe( 'topic1', {
   ackDeadlineSeconds: 90,
   autoAck: true,
   interval: 30
