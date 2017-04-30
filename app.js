@@ -31,6 +31,8 @@ pubsub.subscribe( 'projects/testjewelchat/topics/topic1', {
 
   const subscription = data[0];
 
+  console.log('Subscription name:'+ subscription.name);
+
   function onError(err) {
 
     console.log('Error subscription');
