@@ -23,7 +23,7 @@ const pubsub = require('@google-cloud/pubsub')();
 
 
 
-pubsub.subscribe( 'projects/testjewelchat/topics/topic1', {
+pubsub.subscribe( 'projects/testjewelchat/topics/topic1', 'mayukh',{
   ackDeadlineSeconds: 90,
   autoAck: true,
   interval: 30
