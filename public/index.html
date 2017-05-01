@@ -17,6 +17,10 @@
 			  console.log(data);
 			});
 
+			$('#pid').click( e => {
+				socket.emit('omg', {x:'Hello World'});
+			});
+
 	</script>
 	
 
