@@ -9,7 +9,9 @@ var sockerioroutes = module.exports = {
   	//socket.on('publish', controllers.publish(packet, callback));
 
 
-
+  	socket.on('omg', (packet) => {
+  		console.log('>>>>>>omg:'+packet.x);
+  	});
 
 
   	socket.on('disconnect', () => {
