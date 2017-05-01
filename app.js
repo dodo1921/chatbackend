@@ -11,7 +11,7 @@ const index = require('./routes');
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
-io.set('transports', ['websocket']);
+//io.set('transports', ['websocket']);
 
 const socketioutils = require('./utils/socketioutils');
 const socketioroutes = require('./socketioroutes');
@@ -61,13 +61,13 @@ io.on('connection', function(socket){
   console.log('a user connected');
   socket.join('omg');
   socket.emit('join', { pid: process.pid});
-	//socketioroutes.setup(socket, 'topic');
-  socket.on('disconnect', () => {
+	socketioroutes.setup(socket, 'topic');
+  /*socket.on('disconnect', () => {
 
       console.log('Disconnected');
       
 
-  });
+  });*/
 
 });
 
