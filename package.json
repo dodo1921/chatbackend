@@ -19,6 +19,7 @@
     "socket.io-client": "^1.7.3",
     "knex": "*",
     "mysql": "^2.13.0",
-    "mysql2": "*"
+    "mysql2": "*",
+    "fluent-logger": "*"
   }
 }

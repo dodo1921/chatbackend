@@ -21,6 +21,33 @@ const pubsub = require('@google-cloud/pubsub')();
 
 //const knex = require('./util/knex');
 
+const structuredLogger = require('fluent-logger').createFluentSender('myapp', {
+  host: 'localhost',
+  port: 24224,
+  timeout: 3.0
+});
+
+/*
+const report = function (err, req) {
+  const payload = {
+    serviceContext: {
+      service: 'myapp'
+    },
+    message: err.stack,
+    context: {
+      httpRequest: {
+        url: req.originalUrl,
+        method: req.method,
+        referrer: req.header('Referer'),
+        userAgent: req.header('User-Agent'),
+        remoteIp: req.ip,
+        responseStatusCode: 500
+      }
+    }
+  };
+  structuredLogger.emit('errors', payload);
+};
+*/
 
 
 pubsub.subscribe( 'projects/testjewelchat/topics/topic1', 'mayukh',{
@@ -59,6 +86,7 @@ io.use(socketioutils.authenticate);
 io.on('connection', function(socket){
 
   console.log('a user connected');
+  structuredLogger.emit('info', {msg: 'Connection'});
   socket.join('omg');
   socket.emit('join', { pid: process.pid});
 	socketioroutes.setup(socket, 'topic');
