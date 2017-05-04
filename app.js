@@ -27,25 +27,19 @@ const structuredLogger = require('fluent-logger').createFluentSender('myapp', {
   timeout: 3.0
 });
 
-var  Memcached = require('memcached');
-var memcached = new Memcached();
+let  Memcached = require('memcached');
+let memcached = new Memcached('35.187.204.98:11211');
 
-memcached.connect( '35.187.204.98:11211', function( err, conn ){
-  if( err ) throw new Error( err );
-  console.log( conn.server );
-
-  memcached.set('foo', 'bar', 10000, function (err) { 
+memcached.set('foo', 'bar', 10000, function (err) { 
     console.log('Memcached....') 
 
       memcached.get('foo', function (err, data) {
         console.log('Memcached:'+data);
       });
 
-  });
-
-
-
 });
+
+
 
 
 
