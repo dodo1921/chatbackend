@@ -28,7 +28,7 @@ const structuredLogger = require('fluent-logger').createFluentSender('myapp', {
 });
 
 let  Memcached = require('memcached');
-let memcached = new Memcached('35.187.204.98:11211');
+let memcached = new Memcached('10.146.0.2:11211');
 
 memcached.set('foo', 'bar', 10000, function (err) { 
     console.log('Memcached....') 
