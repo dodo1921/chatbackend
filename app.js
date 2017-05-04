@@ -33,13 +33,21 @@ const memcached = new Memcached();
 memcached.connect( '35.187.204.98:11211', function( err, conn ){
   if( err ) throw new Error( err );
   console.log( conn.server );
+
+  memcached.set('foo', 'bar', 10000, function (err) { 
+    console.log('Memcached....') 
+
+      memcached.get('foo', function (err, data) {
+        console.log('Memcached:'+data);
+      });
+
+  });
+
+
+
 });
 
-memcached.set('foo', 'bar', 10000, function (err) { console.log('Memcached....') });
 
-memcached.get('foo', function (err, data) {
-  console.log('Memcached:'+data);
-});
 
 /*
 const report = function (err, req) {
