@@ -1,7 +1,8 @@
 'use strict'
 
-var controllers = module.exports = {
+module.exports = {
 
-	
-	
+	onetoone : require('onetoone'),
+	group: require('group'),
+	presence: require('presence')	
 };

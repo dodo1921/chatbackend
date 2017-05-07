@@ -21,6 +21,7 @@
     "mysql": "^2.13.0",
     "mysql2": "*",
     "fluent-logger": "*",
-    "memcached": "*"
+    "memcached": "*",
+    "request": "*"
   }
 }
