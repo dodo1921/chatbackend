@@ -8,12 +8,17 @@ const io = require('./sock').getInstance();
 const gcm = require('./utils/firebase');
 const pubsub = require('@google-cloud/pubsub')();
 
+const jewel = require('./utils/jewel');
+
 var sockerioroutes = module.exports = {
   
   setup: function(socket, topic){
 
   	socket.on('publish', data =>{
 
+      let j = jewel.generateForOneToOne();
+
+      //insert in chat table
 
       io.of('/').in(data.channel).clients(function(error, clients){
 
