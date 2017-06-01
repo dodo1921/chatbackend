@@ -22,6 +22,8 @@
     "mysql2": "*",
     "fluent-logger": "*",
     "memcached": "*",
-    "request": "*"
+    "request": "*",
+    "passport.socketio": "*"
+
   }
 }

@@ -3,12 +3,14 @@
 const knex = require('./knex');
 const memcached = require('./memcache');
 const structuredLogger = require('./logger');
+const signature = require('cookie-signature');
 
 var socketioutils = module.exports = {
   
   authenticate: function(socket, next){
   	
-  	let str = socket.request.headers.cookie;
+  	let c = socket.request.headers.cookie;
+  	let str = decodeURIComponent(c);
 
     if (typeof str !== 'string') {
 	    next(new Error('Auth Error'));
@@ -24,7 +26,7 @@ var socketioutils = module.exports = {
 
     if (val !== false) {
 
-    	memcached.get( val , (err, data) ==> {
+    	memcached.get( val , (err, data) => {
 
     			if(err){
     								//Log error
@@ -40,7 +42,7 @@ var socketioutils = module.exports = {
 													next(new Error('Auth Error'));
 											else if(users[0].active){	
 													socket.request.headers.user = users[0];
-													memcached.set(val, users[0], 600, err ==> { /* log error */
+													memcached.set(val, users[0], 600, err => { /* log error */
 
 															if(err)
 																	structuredLogger.emit('error', 'Memcached Error'); 
@@ -65,7 +67,7 @@ var socketioutils = module.exports = {
 													next(new Error('Auth Error'));
 											else if(users[0].active){	
 													socket.request.headers.user = users[0];
-													memcached.set(val, users[0], 600, err ==> { /* log error */});
+													memcached.set(val, users[0], 600, err => { /* log error */});
 													next();	
 											}		
 
