@@ -45,7 +45,9 @@ var socketioutils = module.exports = {
 													next(new Error('Auth Error'));
 											else if(users[0].active){	
 													socket.request.headers.user = users[0];
-													memcached.set(sessionId, users[0], 600, err => { /* log error */
+
+
+													memcached.set( sessionId, users[0], 600, err => { /* log error */
 
 															if(err)
 																	structuredLogger.emit('error', 'Memcached Error'); 

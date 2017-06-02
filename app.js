@@ -118,10 +118,15 @@ io.on('connection', function(socket){
   socket.request.headers.user.online = true;
   socket.request.headers.user.topic = topicname;
 
-  memcached.set( socket.request.headers.user.id , socket.request.headers.user, 600, function (err) { });  
+  let rt = {};
+  rt.online = true;
+  rt.topic = topicname;
+  
+
+  memcached.set( socket.request.headers.user.id , rt , 600, function (err) { });
   socket.join(socket.request.headers.user.id);
   socket.emit('join', { pid: process.pid});
-
+  knex('user').where({id: socket.request.headers.user.id }).update(rt).then(()=>{}).catch(err=>{});
 	socketioroutes.setup(socket, topicname );  
 
 });

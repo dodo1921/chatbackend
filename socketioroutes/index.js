@@ -20,7 +20,7 @@ function sendRTmsg(data){
             if(clients.length>0)
               io.of('/').in(data.receiver_id).emit( data.eventname, data );
             else{
-                memcached.get(data.receiver_id, (err, user)=>{
+                memcached.get(data.receiver_id, (err, user)=>{  //MAMCACHED GET
 
                     if(!err){
                         if( user !== undefined && user.online){
@@ -38,6 +38,26 @@ function sendRTmsg(data){
                                     
                                 });
                         }
+                    }
+                    else{
+
+                        knex('users').where({
+                          id: data.receiver_id
+                        }).select()
+                        .then( users =>{
+
+                          if(users[0]){
+
+                            if(user[0].online)
+                              pubsub.publish(user[0].topic, data);
+                            else  
+                              gcm.emit( data, users[0].token_google);                         
+
+                          }
+                          
+                        })
+                        .catch( err => {});
+
                     }
                 });
             }
@@ -213,7 +233,11 @@ var sockerioroutes = module.exports = {
   	socket.on('disconnect', () => {
 
       socket.request.headers.user.online = false;
-      memcached.set( socket.request.headers.user.id , socket.request.headers.user, 600, function (err) {});  
+      let rt = {};
+      rt.online = false;
+      memcached.set( socket.request.headers.user.id , rt , 600, function (err) {});  
+
+      knex('user').where({id: socket.request.headers.user.id }).update({online:false}).then(()=>{}).catch(err=>{});
   		console.log('Disconnected');
   		//socket.leave('omg');
 
