@@ -30,7 +30,8 @@ const structuredLogger = require('./utils/logger');
 const memcached = require('./utils/memcache');
 
 memcached.set('foo', 'bar', 10000, function (err) { 
-    console.log('Memcached....') 
+      
+      console.log('Memcached....') 
 
       memcached.get('foo', function (err, data) {
         console.log('Memcached:'+data);
@@ -39,30 +40,6 @@ memcached.set('foo', 'bar', 10000, function (err) {
 });
 
 
-
-
-
-/*
-const report = function (err, req) {
-  const payload = {
-    serviceContext: {
-      service: 'myapp'
-    },
-    message: err.stack,
-    context: {
-      httpRequest: {
-        url: req.originalUrl,
-        method: req.method,
-        referrer: req.header('Referer'),
-        userAgent: req.header('User-Agent'),
-        remoteIp: req.ip,
-        responseStatusCode: 500
-      }
-    }
-  };
-  structuredLogger.emit('errors', payload);
-};
-*/
 
 let topicname = 'projects/testjewelchat/topics/topic1';
 let subc_name = 'subscription1';
@@ -174,11 +151,7 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  //res.locals.message = err.message;
-  //res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
+  
   res.status(err.status || 500);
   res.json({error: true, message: err.message });
 });

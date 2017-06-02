@@ -4,37 +4,40 @@ const knex = require('./knex');
 const memcached = require('./memcache');
 const structuredLogger = require('./logger');
 const signature = require('cookie-signature');
+const cp = require('cookie-parser');
 
 var socketioutils = module.exports = {
   
   authenticate: function(socket, next){
   	
-  	let c = socket.request.headers.cookie;
-  	let str = decodeURIComponent(c);
+  	
 
-    if (typeof str !== 'string') {
-	    next(new Error('Auth Error'));
-	  }
+  	let cookieParser = cp(secret);
+	  let req = {
+	    headers:{
+	      cookie: socket.request.headers.cookie
+	    }
+	  };
+	  let result;
+	  cookieParser(req, {}, function (err) {
+	    if (err) throw err;
+	    result = req.signedCookies || req.cookies;
+	  });
 
-	  if (str.substr(0, 2) !== 's:') {
-	    next(new Error('Auth Error'));
-	  }
+  	let sessionId = result['connect.sid'];
 
-	  var secret = ''; //process.env.secret
-	  
-    var val = signature.unsign(str.slice(2), secret)
+    if (sessionId !== false) {
 
-    if (val !== false) {
+    	memcached.get( sessionId , (err, data) => {
 
-    	memcached.get( val , (err, data) => {
-
-    			if(err){
+    			if(err || data===undefined){
     								//Log error
-    								structuredLogger.emit('error', 'Memcached Error'); 
+    								if(err)
+    									structuredLogger.emit('error', 'Memcached Error'); 
 
-				    				knex('users').where({
-										  id: val
-										}).select().then( users =>{
+				    				knex('users').where({sessionId})
+				    				.select()
+				    				.then( users =>{
 
 											if(users.length == 0 )
 													next(new Error('Auth Error'));
@@ -42,7 +45,7 @@ var socketioutils = module.exports = {
 													next(new Error('Auth Error'));
 											else if(users[0].active){	
 													socket.request.headers.user = users[0];
-													memcached.set(val, users[0], 600, err => { /* log error */
+													memcached.set(sessionId, users[0], 600, err => { /* log error */
 
 															if(err)
 																	structuredLogger.emit('error', 'Memcached Error'); 
@@ -55,26 +58,7 @@ var socketioutils = module.exports = {
 												next(new Error('Auth Error'));
 										});
 
-    			}else if(data===undefined){
-
-	    							knex('users').where({
-										  id: val
-										}).select().then( users =>{
-
-											if(users.length == 0 )
-													next(new Error('Auth Error'));
-											else if(!users[0].active)
-													next(new Error('Auth Error'));
-											else if(users[0].active){	
-													socket.request.headers.user = users[0];
-													memcached.set(val, users[0], 600, err => { /* log error */});
-													next();	
-											}		
-
-										});				
-
-
-	    		}else{
+    			}else{
 
 					    			if(data.active){
 					    				socket.request.headers.user = data;
