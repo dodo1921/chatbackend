@@ -13,7 +13,7 @@ const jewel = require('./utils/jewel');
 
 function sendRTmsg(data){
 
-      io.of('/').in(data.receiver_id).clients(function(error, clients){
+      io.of('/').in(data.receiver_id).clients( (error, clients)=>{
 
           if(!error){
 
@@ -32,8 +32,10 @@ function sendRTmsg(data){
                                 knex('users').where({
                                   id: data.receiver_id
                                 }).select().then( users =>{
-                                  if(users[0])
+                                  if(users[0]){
+                                    memcached.set( user[0].id, users[0], 600, err => {} ); 
                                     gcm.emit( data, users[0].token_google);
+                                  }
                                 }).catch( err => {
                                     
                                 });

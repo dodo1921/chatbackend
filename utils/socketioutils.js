@@ -26,52 +26,59 @@ var socketioutils = module.exports = {
 
   	let sessionId = result['connect.sid'];
 
+  	let parts = sessionId.split('::::');
+
     if (sessionId !== false) {
 
-    	memcached.get( sessionId , (err, data) => {
+    	let parts = sessionId.split('::::');
+    	if(parts.length != 2)
+    		next(new Error('Auth Error'));
+    	else{
+			    	memcached.get( parts[0] , (err, data) => {
 
-    			if(err || data===undefined){
-    								//Log error
-    								if(err)
-    									structuredLogger.emit('error', 'Memcached Error'); 
+			    			if(err || data===undefined){
+			    								//Log error
+			    								if(err)
+			    									structuredLogger.emit('error', 'Memcached Error'); 
 
-				    				knex('users').where({sessionId})
-				    				.select()
-				    				.then( users =>{
+							    				knex('users').where({id: part[0], scode: parts[1], active:true })
+							    				.select()
+							    				.then( users =>{
 
-											if(users.length == 0 )
-													next(new Error('Auth Error'));
-											else if(!users[0].active)
-													next(new Error('Auth Error'));
-											else if(users[0].active){	
-													socket.request.headers.user = users[0];
+														if(users.length == 0 )
+																next(new Error('Auth Error'));
+														else if(!users[0].active)
+																next(new Error('Auth Error'));
+														else if(users[0].active){	
+																socket.request.headers.user = users[0];
 
 
-													memcached.set( sessionId, users[0], 600, err => { /* log error */
+																memcached.set( user[0].id, users[0], 600, err => { /* log error */
 
-															if(err)
-																	structuredLogger.emit('error', 'Memcached Error'); 
+																		if(err)
+																				structuredLogger.emit('error', 'Memcached Error'); 
 
+																});
+																next();							
+														}		
+
+													}).catch( err => {
+															next(new Error('Auth Error'));
 													});
-													next();							
-											}		
 
-										}).catch( err => {
-												next(new Error('Auth Error'));
-										});
+			    			}else{
 
-    			}else{
+								    			if(data.active){
+								    				socket.request.headers.user = data;
+								    				next();
+								    			}
+								    			else
+								    				next(new Error('Auth Error'));
 
-					    			if(data.active){
-					    				socket.request.headers.user = data;
-					    				next();
-					    			}
-					    			else
-					    				next(new Error('Auth Error'));
-
-	    		}    			
-        
-      });
+				    		}    			
+			        
+			      });
+					}
 
     }else
     	next(new Error('Auth Error'));
