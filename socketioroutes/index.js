@@ -1,72 +1,17 @@
 'use strict'
 
-var controllers = require('../controllers');
+
 const knex = require('../utils/knex');
 const memcached = require('../utils/memcache');
 const structuredLogger = require('../utils/logger');
-const io = require('./sock').getInstance();
-const gcm = require('./utils/firebase');
+const io = require('../sock').getInstance();
+const gcm = require('../utils/firebase');
 const pubsub = require('@google-cloud/pubsub')();
 
-const jewel = require('./utils/jewel');
+const jewel = require('../utils/jewel');
 
+const sendRT = require('../utils/sendRT');
 
-function sendRTmsg(data){
-
-      io.of('/').in(data.receiver_id).clients( (error, clients)=>{
-
-          if(!error){
-
-            if(clients.length>0)
-              io.of('/').in(data.receiver_id).emit( data.eventname, data );
-            else{
-                memcached.get(data.receiver_id, (err, user)=>{  //MAMCACHED GET
-
-                    if(!err){
-                        if( user !== undefined && user.online){
-                          //pubsub send
-                          pubsub.publish(user.topic, data);
-                        }else if(user !== undefined && !user.online){
-                          gcm.emit(data, user.token_google);
-                        }else if(user === undefined){
-                                knex('users').where({
-                                  id: data.receiver_id
-                                }).select().then( users =>{
-                                  if(users[0]){
-                                    memcached.set( user[0].id, users[0], 600, err => {} ); 
-                                    gcm.emit( data, users[0].token_google);
-                                  }
-                                }).catch( err => {
-                                    
-                                });
-                        }
-                    }
-                    else{
-
-                        knex('users').where({
-                          id: data.receiver_id
-                        }).select()
-                        .then( users =>{
-
-                          if(users[0]){
-
-                            if(user[0].online)
-                              pubsub.publish(user[0].topic, data);
-                            else  
-                              gcm.emit( data, users[0].token_google);                         
-
-                          }
-                          
-                        })
-                        .catch( err => {});
-
-                    }
-                });
-            }
-          }
-      });
-
-}
 
 var sockerioroutes = module.exports = {
   
@@ -88,7 +33,7 @@ var sockerioroutes = module.exports = {
             socket.emit('publish_ack', {error: true} );
           });
 
-          sendRTmsg(data);
+          sendRT.sendRTmsg(data);
 
 
     });
@@ -108,7 +53,7 @@ var sockerioroutes = module.exports = {
             socket.emit('delivery_ack', {error: true} );
           });
 
-          sendRTmsg(data);
+          sendRT.sendRTmsg(data);
 
 
     });
@@ -131,7 +76,7 @@ var sockerioroutes = module.exports = {
           });
 
           
-          sendRTmsg(data);    
+          sendRT.sendRTmsg(data);    
 
     });
 
@@ -151,7 +96,7 @@ var sockerioroutes = module.exports = {
             socket.emit('publish_group_ack', {error: true} );
           });
 
-          sendRTmsg(data);    
+          sendRT.sendRTmsg(data);    
 
     });
 
@@ -173,7 +118,7 @@ var sockerioroutes = module.exports = {
             socket.emit('publish_group_active_ack', {error: true} );
           });
 
-          sendRTmsg(data);    
+          sendRT.sendRTmsg(data);    
 
       
     });
@@ -194,7 +139,7 @@ var sockerioroutes = module.exports = {
           });
 
           
-          sendRTmsg(data);         
+          sendRT.sendRTmsg(data);         
       
 
     });
@@ -213,7 +158,7 @@ var sockerioroutes = module.exports = {
             socket.emit('read_group_ack', {error: true} );
           });
           
-          sendRTmsg(data);    
+          sendRT.sendRTmsg(data);    
 
     });
 

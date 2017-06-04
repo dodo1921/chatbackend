@@ -6,7 +6,7 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
 const index = require('./routes');
-
+const config = require('./utils/config');
 
 const app = express();
 const server = require('http').Server(app);
@@ -16,16 +16,16 @@ const io = require('./sock').init(server);
 //io.set('transports', ['websocket']);
 
 const socketioutils = require('./utils/socketioutils');
+const sendRT = require('./utils/sendRT');
 const socketioroutes = require('./socketioroutes');
 
 
-const pubsub = require('@google-cloud/pubsub')();
 
 const gcm = require('./utils/firebase');
 
 //const knex = require('./util/knex');
 
-const structuredLogger = require('./utils/logger');
+const log = require('./utils/logger');
 
 const memcached = require('./utils/memcache');
 
@@ -41,71 +41,38 @@ memcached.set('foo', 'bar', 10000, function (err) {
 
 
 
-let topicname = 'projects/testjewelchat/topics/topic1';
-let subc_name = 'subscription1';
+
+if(config.env === 'production'){
+    const pubsub = require('@google-cloud/pubsub')();
+
+    pubsub.subscribe( config.topicname, config.subc_name ,{
+      ackDeadlineSeconds: 90,
+      autoAck: true,
+      interval: 30
+    }).then( data => {
+
+      const subscription = data[0];
+      
+
+      function onError(err) {        
+        log.logger('error', 'Subscription Error:'+ err);
+      }
+
+      function onMessage(message) {
+        sendRT.sendRTmsg(message);        
+      }
+
+      subscription.on('error', onError);
+      subscription.on('message', onMessage);
 
 
-pubsub.subscribe( topicname, subc_name ,{
-  ackDeadlineSeconds: 90,
-  autoAck: true,
-  interval: 30
-}).then( data => {
-
-  const subscription = data[0];
-
-  console.log('Subscription name:' + subscription.name);
-  structuredLogger.emit('error', 'Subscription name:'+ subscription.name); 
-
-  function onError(err) {
-
-    console.log('Error subscription');
-    structuredLogger.emit('error', 'Subscription Error:'+ err);  
-
-  }
-
-  function onMessage(message) {
-
-      //var clientNumber = io.sockets.adapter.rooms[room].length;
-
-      io.of('/').in(message.channel).clients(function(error, clients){
-          
-          //if (error) throw error;
-          
-          if(clients.length>0){
-
-              io.to(message.channel).emit( message.eventname , message );
-
-          }else{
-
-              //rewrite memcache and turn the client offline
-              memcache.get(message.channel, (err, data) => {
-
-                  if(!err){
-
-                    data.online = false;
-                    memcache.set(message.channel, data, (err, data) => {  });
-
-                  }
-
-              });
-              //send via gcm
-              
-              gcm.emit(message);
-
-          }
-
-      });     
-
-  }
-
-  subscription.on('error', onError);
-  subscription.on('message', onMessage);
+    }).catch( err => {
+        console.log('Error pubsub'+ err );
+        structuredLogger.emit('error', 'Subscription Error:'+ err);  
+    });
 
 
-}).catch( err => {
-    console.log('Error pubsub'+ err );
-    structuredLogger.emit('error', 'Subscription Error:'+ err);  
-});
+}
 
 
 
