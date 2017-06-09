@@ -50,6 +50,33 @@ let helperfunc = function(data){
 }
 
 
+let helperfunc_group = function(group, data, user_id){
+
+	for(let i=0; i<group.length; i++){
+
+		if(group[i].sender_id !== user_id){
+
+				if(group[i].online){
+
+						if(group[i].topic === config.topicname)
+								io.of('/').in(group[i].id).emit( data.eventname, data );
+						else{
+								data.receiver_id = group[i].id;
+								pubsub.publish(group[i].topic, data);
+						}		
+				}else{
+					gcm.emit(data, group[i].token_google);
+				}
+
+
+		}
+
+	} 
+
+
+}
+
+
 module.exports = {
 
 
@@ -68,6 +95,20 @@ module.exports = {
 			            	helperfunc(data)
 			          
 			      });
+
+	},
+
+	sendRTGroupmsg: function(data, user_id){
+
+
+						knex('groupmembers').where({ group_id: data.group_id}).join('users', 'users.id', '=', 'groupmembers.user_id')
+				  	.select('users.id as id', 'users.topic as topic', 'users.online as online', 'users.token_google as token_google' )
+						.then((group)=>{
+							//memcached.set( 'gr_'+data.group_id , group , 600, function (err) {});  
+							helperfunc_group(group, data, user_id);
+						})
+
+						
 
 	}
 

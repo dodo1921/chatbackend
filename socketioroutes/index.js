@@ -96,7 +96,7 @@ var sockerioroutes = module.exports = {
             socket.emit('publish_group_ack', {error: true} );
           });
 
-          sendRT.sendRTmsg(data);    
+          sendRT.sendRTGroupmsg(data, socket.request.headers.user.id);
 
     });
 
@@ -118,7 +118,7 @@ var sockerioroutes = module.exports = {
             socket.emit('publish_group_active_ack', {error: true} );
           });
 
-          sendRT.sendRTmsg(data);    
+          sendRT.sendRTGroupmsg(data, socket.request.headers.user.id);    
 
       
     });

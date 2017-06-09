@@ -21,6 +21,12 @@
 				socket.emit('omg', { x:'Hello World' });
 			});
 
+			socket.on('error', function (data) {
+		  	$('#pid').text(data);
+			  console.log(data);
+			});
+
+			
 	</script>
 	
 

@@ -80,14 +80,14 @@ io.use(socketioutils.authenticate);
 
 io.on('connection', function(socket){
   
-  structuredLogger.emit('info', 'Connection '+ socket.request.headers.user.id);
+  log.logger('Connection');
 
   socket.request.headers.user.online = true;
-  socket.request.headers.user.topic = topicname;
+  socket.request.headers.user.topic = config.topicname;
 
   let rt = {};
   rt.online = true;
-  rt.topic = topicname;
+  rt.topic = config.topicname;
   
 
   memcached.set( socket.request.headers.user.id , socket.request.headers.user , 600, function (err) { });

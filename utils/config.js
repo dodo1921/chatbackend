@@ -21,4 +21,6 @@ config.memcached = process.env.memcached || 'localhost';
 
 config.gcmkey = process.env.gcmkey || '';
 
+config.secret = process.env.secret || 'ilovescotchscotchyscotchscotch';
+
 
