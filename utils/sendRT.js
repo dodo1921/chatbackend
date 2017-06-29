@@ -50,6 +50,27 @@ let helperfunc = function(data){
 }
 
 
+let helperfuncTyping = function(data){
+
+	memcached.get(data.receiver_id, (err, user)=>{
+
+			if(err || user === undefined){
+					
+
+			}else{
+
+					if(user.online && user.topic !== config.topicname && config.env === 'production')
+	          pubsub.publish(user.topic, data);
+	         
+
+			}
+
+	});            
+
+
+}
+
+
 let helperfunc_group = function(group, data, user_id){
 
 	for(let i=0; i<group.length; i++){
@@ -109,6 +130,23 @@ module.exports = {
 						})
 
 						
+
+	},
+
+	sendTyping: function(data){
+
+						io.of('/').in(data.receiver_id).clients( (error, clients)=>{
+
+			          	if(error){			          		
+			          		return;
+			          	}
+
+			            if(clients.length>0)
+			              io.of('/').in(data.receiver_id).emit( data.eventname, data );
+			            else
+			            	helperfuncTyping(data)
+			          
+			      });		
 
 	}
 

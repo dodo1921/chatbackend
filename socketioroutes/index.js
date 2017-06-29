@@ -19,21 +19,21 @@ var sockerioroutes = module.exports = {
 
   	socket.on('publish', data =>{
 
-          let j = jewel.generateForOneToOne();
+        let j = jewel.generateForOneToOne();
 
-          data.jeweltype_id = j;
-          data.created_at = new Date().getTime();
-          // insert in chat table
+        data.jeweltype_id = j;
+        data.created_at = new Date().getTime();
+        // insert in chat table
 
-          knex.returning('id').table('chats').insert(data)
-          .then( id => {
-            socket.emit('publish_ack', {error: false} );
-          })
-          .catch( err =>{
-            socket.emit('publish_ack', {error: true} );
-          });
-
+        knex.returning('id').table('chats').insert(data)
+        .then( id => {
+          data.id = id[0];
           sendRT.sendRTmsg(data);
+          socket.emit('publish_ack', { error: false, msg_id: data.sender_msgid, serverid: id[0], created_at: data.created_at } );
+        })
+        .catch( err =>{
+          socket.emit('publish_ack', {error: true, message : err.message } );
+        });     
 
 
     });
@@ -47,18 +47,15 @@ var sockerioroutes = module.exports = {
 
           knex.returning('id').table('chats').insert(data)
           .then( id => {
-            socket.emit('delivery_ack', {error: false} );
+            sendRT.sendRTmsg(data);
+            socket.emit('delivery_ack', { error: false, serverid: id[0] , delivered: data.created_at } );
           })
           .catch( err =>{
-            socket.emit('delivery_ack', {error: true} );
-          });
-
-          sendRT.sendRTmsg(data);
+            socket.emit('delivery_ack', { error: true } );
+          });         
 
 
     });
-
-
 
 
     socket.on('read', data =>{
@@ -69,14 +66,12 @@ var sockerioroutes = module.exports = {
 
           knex.returning('id').table('chats').insert(data)
           .then( id => {
-            socket.emit('read_ack', {error: false} );
+            sendRT.sendRTmsg(data);
+            socket.emit('read_ack', { error: false, serverid: id[0] , read: data.created_at } );
           })
           .catch( err =>{
-            socket.emit('read_ack', {error: true} );
-          });
-
-          
-          sendRT.sendRTmsg(data);    
+            socket.emit('read_ack', { error: true } );
+          });            
 
     });
 
@@ -90,13 +85,13 @@ var sockerioroutes = module.exports = {
 
           knex.returning('id').table('groupchats').insert(data)
           .then( id => {
-            socket.emit('publish_group_ack', {error: false} );
+            sendRT.sendRTGroupmsg(data, socket.request.headers.user.id);
+            socket.emit('publish_group_ack', {error: false, msg_id: data.sender_msgid, serverid: id[0], created_at: data.created_at} );
           })
           .catch( err =>{
             socket.emit('publish_group_ack', {error: true} );
           });
-
-          sendRT.sendRTGroupmsg(data, socket.request.headers.user.id);
+          
 
     });
 
@@ -112,66 +107,38 @@ var sockerioroutes = module.exports = {
 
           knex.returning('id').table('groupchats').insert(data)
           .then( id => {
-            socket.emit('publish_group_active_ack', {error: false} );
+            sendRT.sendRTGroupmsg(data, socket.request.headers.user.id);
+            socket.emit('publish_group_ack', {error: false, msg_id: data.sender_msgid, serverid: id[0], created_at: data.created_at} );
           })
           .catch( err =>{
-            socket.emit('publish_group_active_ack', {error: true} );
-          });
-
-          sendRT.sendRTGroupmsg(data, socket.request.headers.user.id);    
+            socket.emit('publish_group_ack', {error: true} );
+          });   
 
       
     });
 
 
+    socket.on('check_online', id=>{     
 
-    socket.on('delivery_group', data =>{
+        memcached.get( id , (err, data) => {
 
-          data.created_at = new Date().getTime();
-          // insert in chat table
+          if(!err && data !== undefined){
 
-          knex.returning('id').table('chats').insert(data)
-          .then( id => {
-            socket.emit('delivery_group_ack', {error: false} );
-          })
-          .catch( err =>{
-            socket.emit('delivery_group_ack', {error: true} );
-          });
+             socket.emit('checkonline_ack', { id , online: data.online } ); 
 
-          
-          sendRT.sendRTmsg(data);         
-      
+          }
+
+        });
 
     });
 
-
-    socket.on('read_group', data =>{
-
-          data.created_at = new Date().getTime();
-          // insert in chat table
-
-          knex.returning('id').table('chats').insert(data)
-          .then( id => {
-            socket.emit('read_group_ack', {error: false} );
-          })
-          .catch( err =>{
-            socket.emit('read_group_ack', {error: true} );
-          });
-          
-          sendRT.sendRTmsg(data);    
-
-    });
 
     socket.on('typing', data =>{     
-      
+        
+        sendRT.sendTyping(data);
 
-    }); 
 
-
-    socket.on('typing_group', data =>{      
-      
-
-    });  
+    });    
 
 
   	
