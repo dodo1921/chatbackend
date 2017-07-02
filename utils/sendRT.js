@@ -8,7 +8,9 @@ const io = require('../sock').getInstance();
 const gcm = require('../utils/firebase');
 const config = require('../utils/config');
 
-const pubsub = require('@google-cloud/pubsub')();
+//const pubsub = require('@google-cloud/pubsub')();
+
+const pub  = require('../utils/inter_process');
 
 
 
@@ -26,7 +28,8 @@ let helperfunc = function(data){
 	          if(users[0]){
 
 	            if(user[0].online && user[0].topic !== config.topicname && config.env === 'production')
-	              pubsub.publish(user[0].topic, data);
+	            	pub.emit(user[0].topic, data);
+	              //pubsub.publish(user[0].topic, data);
 	            else  
 	              gcm.emit( data, users[0].token_google);                         
 
@@ -38,7 +41,8 @@ let helperfunc = function(data){
 			}else{
 
 					if(user.online && user.topic !== config.topicname && config.env === 'production')
-	          pubsub.publish(user.topic, data);
+	          pub.emit(user[0].topic, data);
+	              //pubsub.publish(user.topic, data);
 	        else  
 	          gcm.emit( data, users.token_google); 
 
@@ -60,7 +64,8 @@ let helperfuncTyping = function(data){
 			}else{
 
 					if(user.online && user.topic !== config.topicname && config.env === 'production')
-	          pubsub.publish(user.topic, data);
+	          pub.emit(user[0].topic, data);
+	              //pubsub.publish(user.topic, data);
 	         
 
 			}
@@ -83,7 +88,8 @@ let helperfunc_group = function(group, data, user_id){
 								io.of('/').in(group[i].id).emit( data.eventname, data );
 						else{
 								data.receiver_id = group[i].id;
-								pubsub.publish(group[i].topic, data);
+								pub.emit(group[i].topic, data);
+	              //pubsub.publish(group[i].topic, data);
 						}		
 				}else{
 					gcm.emit(data, group[i].token_google);

@@ -1,0 +1,41 @@
+'use strict'
+
+const request = require('request');
+const config = require('./config');
+
+const log = require('./logger');
+
+let topic = module.exports;
+
+topic.name = '';
+
+topic.initialize = function(){
+
+	if(config.env === 'production'){
+		
+			request({
+					headers: {	      
+		      	'X-Google-Metadata-Request': true		      	
+		    	},
+			    uri: 'http://metadata/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip',			    
+			    method: 'GET'
+			  }, function (err, res, body) {
+
+			  		if(err)
+			  			log.logger('error', 'topic initialize error:' + err );
+			  		else
+			  			topic.name = body;
+			     
+			  });
+
+	}else{
+
+		topic.name = 'localhost:3000';
+	}		
+
+};
+
+
+
+
+

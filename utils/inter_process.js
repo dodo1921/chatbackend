@@ -5,20 +5,13 @@ const config = require('./config');
 
 const log = require('./logger');
 
-let gcm = module.exports;
+let pub = module.exports;
 
-gcm.emit = function(message, to){
-
-		let msg = {};
-	  msg.to = to;
-	  msg.data = message;
-
+pub.emit = function(server_uri, msg ){
+		
 		request({
-		    headers: {	      
-		      'Content-Type': 'application/json',
-		      'Authorization': 'key=' + config.gcmkey
-		    },
-		    uri: 'https://fcm.googleapis.com/fcm/send',
+
+		    uri: server_uri,
 		    body: msg,
 		    method: 'POST'
 		  }, function (err, res, body) {

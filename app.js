@@ -29,6 +29,9 @@ const log = require('./utils/logger');
 
 const memcached = require('./utils/memcache');
 
+const topic = require('./utils/topic_initialize').initialize();
+
+/*
 memcached.set('foo', 'bar', 10000, function (err) { 
       
       console.log('Memcached....') 
@@ -39,9 +42,11 @@ memcached.set('foo', 'bar', 10000, function (err) {
 
 });
 
+*/
 
 
 
+/*
 if(config.env === 'production'){
     const pubsub = require('@google-cloud/pubsub')();
 
@@ -73,7 +78,7 @@ if(config.env === 'production'){
 
 
 }
-
+*/
 
 
 io.use(socketioutils.authenticate);
@@ -83,18 +88,18 @@ io.on('connection', function(socket){
   log.logger('Connection');
 
   socket.request.headers.user.online = true;
-  socket.request.headers.user.topic = config.topicname;
+  socket.request.headers.user.topic = topic.name;
 
   let rt = {};
   rt.online = true;
-  rt.topic = config.topicname;
+  rt.topic = topic.name;
   
 
   memcached.set( socket.request.headers.user.id , socket.request.headers.user , 600, function (err) { });
   socket.join(socket.request.headers.user.id);
   socket.emit('join', { pid: process.pid});
   knex('user').where({id: socket.request.headers.user.id }).update(rt).then(()=>{}).catch(err=>{});
-	socketioroutes.setup(socket, topicname );  
+	socketioroutes.setup(socket);  
 
 });
 
@@ -111,7 +116,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', index);
+app.use('/', function(req, res, next){
+
+  sendRT.sendRTmsg(req.body.data);
+
+  return res.json({error: false});
+
+
+});
 
 
 // catch 404 and forward to error handler

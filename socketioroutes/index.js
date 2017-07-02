@@ -15,7 +15,7 @@ const sendRT = require('../utils/sendRT');
 
 var sockerioroutes = module.exports = {
   
-  setup: function(socket, topic){
+  setup: function(socket){
 
   	socket.on('publish', data =>{
 

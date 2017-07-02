@@ -29,7 +29,7 @@ var socketioutils = module.exports = {
 	  console.log(result);
 
 	  if(!result['connect.sid']){
-	  	console.log('omg')
+	  	//console.log('omg')
 	  	next(new Error('Auth Error')); 
 	  	//socket.disconnect();
 	  	return;
@@ -56,7 +56,7 @@ var socketioutils = module.exports = {
 			    									log.logger('error','Memcached Error...');
 
 							    				knex('users').where({id: part[0], scode: parts[1], active:true })
-							    				.select()
+							    				.select( 'id', 'scode', 'online', 'topic', 'token_google', 'is_rooted', 'jewel_block'  )
 							    				.then( users =>{
 
 														if(users.length == 0 ){
