@@ -12,7 +12,7 @@ topic.name = '';
 topic.initialize = function(){
 
 	if(config.env === 'production'){
-		
+			console.log('Body>>>');
 			request({
 					headers: {	      
 		      	'X-Google-Metadata-Request': true		      	
