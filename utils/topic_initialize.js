@@ -11,7 +11,7 @@ topic.name = '';
 
 topic.initialize = function(){
 
-	if(config.env === 'production'){
+	if(config.env === 'development'){
 			console.log('Body>>>');
 			request({
 					headers: {	      
