@@ -19,12 +19,11 @@ module.exports = {
   production: {
     client: 'mysql',
     connection: {
-      host : config.host,
+      socketPath : `/cloudsql/${process.env.host}`,
       user : config.user,
       password : config.password,
-      database : 'gamechat'
-    },
-    pool: { min: 0, max: 7 }
+      database : 'jc'
+    }
   }
   
 };
