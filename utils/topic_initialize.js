@@ -23,8 +23,10 @@ topic.initialize = function(){
 
 			  		if(err)
 			  			log.logger('error', 'topic initialize error:' + err );
-			  		else
+			  		else{
+			  			console.log('Body>>>'+body);
 			  			topic.name = body;
+			  		}
 			     
 			  });
 

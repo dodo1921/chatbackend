@@ -4,8 +4,20 @@ var express = require('express');
 var router = express.Router();
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.json( { message :'user' } );
+router.post('/', function(req, res, next){
+
+  let data = req.body.data;
+
+  io.of('/').in(data.receiver_id).clients( (error, clients)=>{     	
+
+        if(clients.length>0)
+          io.of('/').in(data.receiver_id).emit( data.eventname, data );        
+      
+  });
+
+  return res.json({error: false});
+
+
 });
 
 module.exports = router;

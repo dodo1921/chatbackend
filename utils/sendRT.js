@@ -11,6 +11,7 @@ const config = require('../utils/config');
 //const pubsub = require('@google-cloud/pubsub')();
 
 const pub  = require('../utils/inter_process');
+const topic = require('../utils/topic_initialize')
 
 
 
@@ -40,8 +41,8 @@ let helperfunc = function(data){
 
 			}else{
 
-					if(user.online && user.topic !== config.topicname && config.env === 'production')
-	          pub.emit(user[0].topic, data);
+					if(user.online && user.topic !== topic.name && config.env === 'production')
+	          pub.emit(user.topic, data);
 	              //pubsub.publish(user.topic, data);
 	        else  
 	          gcm.emit( data, users.token_google); 
@@ -63,8 +64,8 @@ let helperfuncTyping = function(data){
 
 			}else{
 
-					if(user.online && user.topic !== config.topicname && config.env === 'production')
-	          pub.emit(user[0].topic, data);
+					if(user.online && user.topic !== topic.name && config.env === 'production')
+	          	pub.emit(user[0].topic, data);
 	              //pubsub.publish(user.topic, data);
 	         
 

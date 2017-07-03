@@ -19,9 +19,12 @@ var sockerioroutes = module.exports = {
 
   	socket.on('publish', data =>{
 
-        let j = jewel.generateForOneToOne();
+        if(!socket.request.headers.user.jewel_block || !socket.request.headers.user.is_rooted){
 
-        data.jeweltype_id = j;
+          let j = jewel.generateForOneToOne();
+          data.jeweltype_id = j;
+        }
+
         data.created_at = new Date().getTime();
         // insert in chat table
 
@@ -77,9 +80,12 @@ var sockerioroutes = module.exports = {
 
     socket.on('publish_group', data =>{
 
-          let j = jewel.generateForOneToOne();
+          if(!socket.request.headers.user.jewel_block || !socket.request.headers.user.is_rooted){
 
-          data.jeweltype_id = j;
+            let j = jewel.generateForOneToOne();
+            data.jeweltype_id = j;
+          }
+
           data.created_at = new Date().getTime();
           // insert in chat table
 
@@ -98,10 +104,11 @@ var sockerioroutes = module.exports = {
 
     socket.on('publish_group_active', data =>{
 
-
-          let j = jewel.generateForGroup();
-
-          data.jeweltype_id = j;
+          if(!socket.request.headers.user.jewel_block || !socket.request.headers.user.is_rooted){
+            let j = jewel.generateForGroup();
+            data.jeweltype_id = j;
+          }
+            
           data.created_at = new Date().getTime();
           // insert in chat table
 
