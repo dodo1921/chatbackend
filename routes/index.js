@@ -16,7 +16,7 @@ router.post('/', function(req, res, next){
           res.io.of('/').in(data.receiver_id).emit( data.eventname, data );        
       
   });
-  log.logger('info', 'http call');
+  log.logger('info', { msg: 'http call' });
   return res.json({error: false});
 
 
