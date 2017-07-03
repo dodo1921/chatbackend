@@ -8,10 +8,10 @@ router.post('/', function(req, res, next){
 
   let data = req.body.data;
 
-  io.of('/').in(data.receiver_id).clients( (error, clients)=>{     	
+  res.io.of('/').in(data.receiver_id).clients( (error, clients)=>{     	
 
         if(clients.length>0)
-          io.of('/').in(data.receiver_id).emit( data.eventname, data );        
+          res.io.of('/').in(data.receiver_id).emit( data.eventname, data );        
       
   });
 
