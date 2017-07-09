@@ -32,7 +32,22 @@ var sockerioroutes = module.exports = {
         .then( id => {
           data.id = id[0];
           sendRT.sendRTmsg(data);
-          socket.emit('publish_ack', { error: false, msg_id: data.sender_msgid, serverid: id[0], created_at: data.created_at } );
+          socket.emit('publish_ack', { error: false, eventname: 'publish_ack', sender_msgid: data.sender_msgid, chat_id: id[0], created_at: data.created_at } );
+
+          /*
+          let packet = {};
+          packet.chat_id = id[0];
+          packet.sender_id = data.sender_id;
+          packet.sender_msgid = data.sender_msgid;
+          packet.receiver_id = data.sender_id;
+          packet.eventname = 'publish_ack';
+          packet.created_at = data.created_at;
+
+          knex.returning('id').table('chats').insert(packet)
+          .then(id => {})
+          .catch(err => {});  
+          */
+
         })
         .catch( err =>{
           socket.emit('publish_ack', {error: true, message : err.message } );
@@ -51,7 +66,7 @@ var sockerioroutes = module.exports = {
           knex.returning('id').table('chats').insert(data)
           .then( id => {
             sendRT.sendRTmsg(data);
-            socket.emit('delivery_ack', { error: false, serverid: id[0] , delivered: data.created_at } );
+            socket.emit('delivery_ack', { error: false, eventname: 'delivery_ack', sender_msgid: data.sender_msgid,  delivered: data.created_at } );
           })
           .catch( err =>{
             socket.emit('delivery_ack', { error: true } );
@@ -70,7 +85,7 @@ var sockerioroutes = module.exports = {
           knex.returning('id').table('chats').insert(data)
           .then( id => {
             sendRT.sendRTmsg(data);
-            socket.emit('read_ack', { error: false, serverid: id[0] , read: data.created_at } );
+            socket.emit('read_ack', { error: false, eventname: 'read_ack', sender_msgid: data.sender_msgid, , read: data.created_at } );
           })
           .catch( err =>{
             socket.emit('read_ack', { error: true } );
@@ -92,7 +107,20 @@ var sockerioroutes = module.exports = {
           knex.returning('id').table('groupchats').insert(data)
           .then( id => {
             sendRT.sendRTGroupmsg(data, socket.request.headers.user.id);
-            socket.emit('publish_group_ack', {error: false, msg_id: data.sender_msgid, serverid: id[0], created_at: data.created_at} );
+            socket.emit('publish_group_ack', {error: false, eventname: 'publish_group_ack', sender_msgid: data.sender_msgid, chat_id: id[0], created_at: data.created_at} );
+
+            let packet = {};
+            packet.chat_id = id[0];
+            packet.sender_id = data.sender_id;
+            packet.sender_msgid = data.sender_msgid;
+            packet.eventname = 'publish_group_ack';
+            packet.created_at = data.created_at;
+
+            knex.returning('id').table('groupchats').insert(packet)
+            .then(id => {})
+            .catch(err => {}); 
+
+
           })
           .catch( err =>{
             socket.emit('publish_group_ack', {error: true} );
@@ -115,7 +143,19 @@ var sockerioroutes = module.exports = {
           knex.returning('id').table('groupchats').insert(data)
           .then( id => {
             sendRT.sendRTGroupmsg(data, socket.request.headers.user.id);
-            socket.emit('publish_group_ack', {error: false, msg_id: data.sender_msgid, serverid: id[0], created_at: data.created_at} );
+            socket.emit('publish_group_ack', {error: false, eventname: 'publish_group_ack', sender_msgid: data.sender_msgid, chat_id: id[0], created_at: data.created_at} );
+
+            let packet = {};
+            packet.chat_id = id[0];
+            packet.sender_id = data.sender_id;
+            packet.sender_msgid = data.sender_msgid;
+            packet.eventname = 'publish_group_ack';
+            packet.created_at = data.created_at;
+
+            knex.returning('id').table('groupchats').insert(packet)
+            .then(id => {})
+            .catch(err => {}); 
+
           })
           .catch( err =>{
             socket.emit('publish_group_ack', {error: true} );
