@@ -19,6 +19,8 @@ const socketioutils = require('./utils/socketioutils');
 const sendRT = require('./utils/sendRT');
 const socketioroutes = require('./socketioroutes');
 
+const knex = require('./utils/knex');
+
 
 
 const gcm = require('./utils/firebase');
@@ -29,7 +31,9 @@ const log = require('./utils/logger');
 
 const memcached = require('./utils/memcache');
 
-const topic = require('./utils/topic_initialize').initialize();
+const topic = require('./utils/topic_initialize');
+
+topic.initialize();
 
 /*
 memcached.set('foo', 'bar', 10000, function (err) { 
@@ -98,7 +102,7 @@ io.on('connection', function(socket){
   memcached.set( socket.request.headers.user.id , socket.request.headers.user , 600, function (err) { });
   socket.join(socket.request.headers.user.id);
   socket.emit('join', { pid: process.pid});
-  knex('user').where({id: socket.request.headers.user.id }).update(rt).then(()=>{}).catch(err=>{});
+  knex('users').where({id: socket.request.headers.user.id }).update(rt).then(()=>{}).catch(err=>{});
 	socketioroutes.setup(socket);  
 
 });

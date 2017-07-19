@@ -31,7 +31,7 @@ topic.initialize = function(){
 			  });
 
 	}else{
-
+		console.log('topic');	
 		topic.name = 'localhost:3000';
 	}		
 

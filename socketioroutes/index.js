@@ -50,7 +50,7 @@ var sockerioroutes = module.exports = {
 
         })
         .catch( err =>{
-          socket.emit('publish_ack', {error: true, message : err.message } );
+          socket.emit('publish_ack', {error: true, message : err.message, sender_msgid: data.sender_msgid } );
         });     
 
 
@@ -85,7 +85,7 @@ var sockerioroutes = module.exports = {
           knex.returning('id').table('chats').insert(data)
           .then( id => {
             sendRT.sendRTmsg(data);
-            socket.emit('read_ack', { error: false, eventname: 'read_ack', sender_msgid: data.sender_msgid, , read: data.created_at } );
+            socket.emit('read_ack', { error: false, eventname: 'read_ack', sender_msgid: data.sender_msgid, read: data.created_at } );
           })
           .catch( err =>{
             socket.emit('read_ack', { error: true } );
@@ -196,9 +196,9 @@ var sockerioroutes = module.exports = {
       socket.request.headers.user.online = false;
       let rt = {};
       rt.online = false;
-      memcached.set( socket.request.headers.user.id , rt , 600, function (err) {});  
+      memcached.set( socket.request.headers.user.id , socket.request.headers.user , 600, function (err) {});  
 
-      knex('user').where({id: socket.request.headers.user.id }).update({online:false}).then(()=>{}).catch(err=>{});
+      knex('users').where({id: socket.request.headers.user.id }).update({online:false}).then(()=>{}).catch(err=>{});
   		console.log('Disconnected');
   		//socket.leave('omg');
 

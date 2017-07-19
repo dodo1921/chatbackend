@@ -44,6 +44,7 @@ var socketioutils = module.exports = {
 
     	let parts = sessionId.split('::::');
     	if(parts.length != 2){
+    		console.log(parts[0]+'????'+parts[1]);
     		next(new Error('Auth Error'));
     		//socket.disconnect();
     	}
@@ -52,11 +53,12 @@ var socketioutils = module.exports = {
 
 			    			if(err || data===undefined){
 			    								//Log error
+			    								console.log('Here..........1');
 			    								if(err)
 			    									log.logger('error','Memcached Error...');
 
-							    				knex('users').where({id: part[0], scode: parts[1], active:true })
-							    				.select( 'id', 'scode', 'online', 'topic', 'token_google', 'is_rooted', 'jewel_block'  )
+							    				knex('users').where({id: parts[0], scode: parts[1], active:true })
+							    				.select( 'id', 'vcode', 'scode', 'online', 'topic', 'token_google', 'is_rooted', 'jewel_block', 'initialized', 'teamjc_id', 'active')
 							    				.then( users =>{
 
 														if(users.length == 0 ){
@@ -82,6 +84,8 @@ var socketioutils = module.exports = {
 													});
 
 			    			}else{
+
+			    								console.log('Here..........2');	
 			    				
 								    			if(data.active){
 								    				socket.request.headers.user = data;
