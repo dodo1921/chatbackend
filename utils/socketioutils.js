@@ -58,7 +58,7 @@ var socketioutils = module.exports = {
 			    									log.logger('error','Memcached Error...');
 
 							    				knex('users').where({id: parts[0], scode: parts[1], active:true })
-							    				.select( 'id', 'vcode', 'scode', 'online', 'topic', 'token_google', 'is_rooted', 'jewel_block', 'initialized', 'teamjc_id', 'active')
+							    				.select( 'id', 'vcode', 'scode', 'online', 'topic', 'token_google', 'is_rooted', 'jewel_block', 'initialized', 'teamjc_id', 'teamjc_phone', 'active')
 							    				.then( users =>{
 
 														if(users.length == 0 ){

@@ -45,7 +45,7 @@ let helperfunc = function(data){
 	          pub.emit(user.topic, data);
 	              //pubsub.publish(user.topic, data);
 	        else  
-	          gcm.emit( data, users.token_google); 
+	          gcm.emit( data, user.token_google); 
 
 			}
 
