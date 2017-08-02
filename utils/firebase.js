@@ -27,6 +27,7 @@ gcm.emit = function(message, to){
 
 	  }
 	  
+	  console.log(JSON.stringify(msg));
 
 		request({
 		    headers: {	      

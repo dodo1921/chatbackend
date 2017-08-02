@@ -20,33 +20,36 @@ let helperfunc = function(data){
 	memcached.get(data.receiver_id, (err, user)=>{
 
 			if(err || user === undefined){
-
-					knex('users').where({
-	          id: data.receiver_id
-	        }).select()
+					//console.log('>>>>>memcached '+data.receiver_id);	
+					knex('users').where({ id: data.receiver_id}).select()
 	        .then( users =>{
-
-	          if(users[0]){
-
-	            if(user[0].online && user[0].topic !== config.topicname && config.env === 'production')
-	            	pub.emit(user[0].topic, data);
+	        	console.log('>>>>>memcached'+JSON.stringify(users));	
+	          if(users.length>0){
+	          	console.log('memcached'+JSON.stringify(users[0]));	
+	            if(users[0].online && users[0].topic !== config.topicname && config.env === 'production')
+	            	pub.emit(users[0].topic, data);
 	              //pubsub.publish(user[0].topic, data);
-	            else  
+	            else{  
+	            	console.log('memcached');
 	              gcm.emit( data, users[0].token_google);                         
-
+	            }
+	              
 	          }
 	          
 	        })
-	        .catch( err => {});
+	        .catch( err => {
+	        	console.log('>>>>>memcached '+err);	
+	        });
 
 			}else{
 
 					if(user.online && user.topic !== topic.name && config.env === 'production')
 	          pub.emit(user.topic, data);
 	              //pubsub.publish(user.topic, data);
-	        else  
+	        else{  
+	        	console.log('database>>>>'+JSON.stringify(user));
 	          gcm.emit( data, user.token_google); 
-
+	        }  
 			}
 
 	});            
